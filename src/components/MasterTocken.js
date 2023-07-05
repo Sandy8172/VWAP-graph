@@ -13,7 +13,7 @@ const MasterTocken = () => {
       const url = "http://14.99.241.31:3000/apimarketdata/instruments/master";
       const headers = {
         Authorization:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiJYNTAyX2RjMDEzOWQ2MmMyM2Q5MjYyMjM5MzciLCJwdWJsaWNLZXkiOiJkYzAxMzlkNjJjMjNkOTI2MjIzOTM3IiwiaWF0IjoxNjg3ODQyOTk5LCJleHAiOjE2ODc5MjkzOTl9.WpqS31qAkAqen-SeJOWrv3P-tPhGkbzlgv_8VlunVpI",
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiJYNTAyX2RjMDEzOWQ2MmMyM2Q5MjYyMjM5MzciLCJwdWJsaWNLZXkiOiJkYzAxMzlkNjJjMjNkOTI2MjIzOTM3IiwiaWF0IjoxNjg4NTMyNjkwLCJleHAiOjE2ODg2MTkwOTB9.sz6ZEud-bz6PoUqVcq4MAoWeyBqkpm9UscJS9VDk1f4",
         "Content-Type": "application/json",
       };
 
@@ -48,6 +48,7 @@ const MasterTocken = () => {
           const latestDateRow = futureData.slice(0, 1);
 
           const exchangeInstrumentID = latestDateRow[0].split("|")[1];
+          console.log(exchangeInstrumentID);
 
           // function to fetch LTP from exchangeInstrumentID -------------------------------------------------
           const fechLTP = async () => {
@@ -55,7 +56,7 @@ const MasterTocken = () => {
               "http://14.99.241.31:3000/apimarketdata/instruments/quotes";
             const headers = {
               Authorization:
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiJYNTAyX2RjMDEzOWQ2MmMyM2Q5MjYyMjM5MzciLCJwdWJsaWNLZXkiOiJkYzAxMzlkNjJjMjNkOTI2MjIzOTM3IiwiaWF0IjoxNjg3ODQyOTk5LCJleHAiOjE2ODc5MjkzOTl9.WpqS31qAkAqen-SeJOWrv3P-tPhGkbzlgv_8VlunVpI",
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiJYNTAyX2RjMDEzOWQ2MmMyM2Q5MjYyMjM5MzciLCJwdWJsaWNLZXkiOiJkYzAxMzlkNjJjMjNkOTI2MjIzOTM3IiwiaWF0IjoxNjg4NTMyNjkwLCJleHAiOjE2ODg2MTkwOTB9.sz6ZEud-bz6PoUqVcq4MAoWeyBqkpm9UscJS9VDk1f4",
             };
 
             const body = {

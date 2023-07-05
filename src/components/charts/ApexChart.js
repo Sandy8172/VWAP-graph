@@ -23,7 +23,7 @@ const [items, setItems]=useState([])
           const { latestData } = response.data;
           setItems(latestData[0].items);
         })
-        .catch(err => console.log(err));
+        .catch(err => console.log(err)); 
     };
 
     // Fetch data initially
@@ -176,8 +176,8 @@ const [items, setItems]=useState([])
       // title:{
       //   text:"VWAP vs LTP" 
       // },
-      min: minValue - 30, // Adjust the y-axis range to start from 20 points below the lowest value
-      max: maxValue + 50
+      min: minValue - 1000, // Adjust the y-axis range to start from 20 points below the lowest value
+      max: maxValue + 1000
     },
     legend: {
       show: true

@@ -1,13 +1,33 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ApexChart from "./charts/ApexChart";
 import axios from "axios";
+import ChartJSChart from "./charts/ChartJSChart";
 // import { getWebSocket, reconnect } from "../util.js";
+
+// Function to calculate the milliseconds until the next third second of the minute
+// const calculateDelayToNextThirdSecond = () => {
+//   const now = new Date();
+//   const targetTime = new Date(now);
+//   targetTime.setSeconds(6); // Set the target seconds to 3
+//   targetTime.setMilliseconds(0); // Reset milliseconds to zero
+
+//   let delay = targetTime - now;
+//   if (delay < 0) {
+//     // If the target time has already passed, add one minute to the delay
+//     targetTime.setMinutes(targetTime.getMinutes() + 1);
+//     delay = targetTime - now;
+//   }
+
+//   return delay;
+// };
 
 function Layout(props) {
   const [socketData, setSocketData] = useState([]);
-  const [VWAP, setVWAP] = useState(0);
-  const [LTP, setLTP] = useState(0);
-  const [elapsedTime, setElapsedTime] = useState(0);
+
+  const latestVWAPRef = useRef(0); // Use ref to store latest VWAP value
+  const latestLTPRef = useRef(0); // Use ref to store latest LTP value
+  const [prevVWAP, setPrevVWAP] = useState(0); // State variable to store previous VWAP value
+  const [prevLTP, setPrevLTP] = useState(0); // State variable to store previous LTP value
 
   const { callTokens, putTokens } = props;
 
@@ -20,7 +40,7 @@ function Layout(props) {
 
     const connectWebSocket = () => {
       ws = new WebSocket(
-        "ws://14.99.241.31:3000/apimarketdata/socket.io/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiJYNTAyX2RjMDEzOWQ2MmMyM2Q5MjYyMjM5MzciLCJwdWJsaWNLZXkiOiJkYzAxMzlkNjJjMjNkOTI2MjIzOTM3IiwiaWF0IjoxNjg3ODQyOTk5LCJleHAiOjE2ODc5MjkzOTl9.WpqS31qAkAqen-SeJOWrv3P-tPhGkbzlgv_8VlunVpI&userID=X502&publishFormat=JSON&broadcastMode=Partial&transport=websocket&EIO=4"
+        "ws://14.99.241.31:3000/apimarketdata/socket.io/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiJYNTAyX2RjMDEzOWQ2MmMyM2Q5MjYyMjM5MzciLCJwdWJsaWNLZXkiOiJkYzAxMzlkNjJjMjNkOTI2MjIzOTM3IiwiaWF0IjoxNjg4NTMyNjkwLCJleHAiOjE2ODg2MTkwOTB9.sz6ZEud-bz6PoUqVcq4MAoWeyBqkpm9UscJS9VDk1f4&userID=X502&publishFormat=JSON&broadcastMode=Partial&transport=websocket&EIO=4"
       );
 
       ws.addEventListener("open", () => {
@@ -128,7 +148,7 @@ function Layout(props) {
       calculatedVWAP += totalPriceVolume / totalVolume;
     });
 
-    setVWAP(calculatedVWAP.toFixed(2)); // Update VWAP state
+    latestVWAPRef.current = calculatedVWAP.toFixed(2); // Update latestVWAP ref
   };
   const calculateLTP = () => {
     let totalHighLowAvg = 0;
@@ -142,41 +162,49 @@ function Layout(props) {
 
     // Calculate VWAP
     const calculatedLTP = totalHighLowAvg;
-    setLTP(calculatedLTP.toFixed(2)); // Update VWAP state
+    latestLTPRef.current = calculatedLTP.toFixed(2); // Update latestLTP ref
   };
 
-  console.log(VWAP, "VWAP");
-  console.log(+LTP, "LTP");
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setElapsedTime((prevElapsedTime) => prevElapsedTime + 1);
-    }, 1000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+  console.log(+latestVWAPRef.current, "VWAP");
+  console.log(+latestLTPRef.current, "LTP");
 
   useEffect(() => {
-    if (elapsedTime > 60 && +VWAP !== 0 && +LTP !== 0) {
-      sendChartData();
-      setElapsedTime(0);
+    // The main useEffect for handling data sending
+    if (+latestVWAPRef.current !== 0 && +latestLTPRef.current !== 0) {
+      checkAndSendData();
     }
-  }, [elapsedTime]);
+    console.log("effect");
+  }, [latestVWAPRef.current, latestLTPRef.current]);
+
+  const checkAndSendData = () => {
+    const currentVWAP = latestVWAPRef.current;
+    const currentLTP = latestLTPRef.current;
+
+    // Check if the values are different from the previous ones
+    if (currentVWAP !== prevVWAP || currentLTP !== prevLTP) {
+      console.log("ltp not 0");
+      setPrevVWAP(currentVWAP);
+      setPrevLTP(currentLTP);
+
+      // Send the data only if it is different from the previous values
+      sendChartData();
+    }
+  };
 
   const sendChartData = () => {
     axios
       .post("http://localhost:8080/postChartData", {
-        VWAP,
-        LTP,
+        VWAP: latestVWAPRef.current, // Send the latest VWAP value from ref
+        LTP: latestLTPRef.current, // Send the latest LTP value from ref
       })
       .then()
-      .catch();
+      .catch((error) => console.error("Error sending data:", error));
   };
 
   return (
     <>
-      <ApexChart/>
+      <ChartJSChart />
+      <ApexChart />
     </>
   );
 }
