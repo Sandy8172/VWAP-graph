@@ -45,7 +45,6 @@ const LineChart = () => {
   const chartRef = useRef(null);
 
   const items = useSelector((state) => state.finalChartData);
-  // console.log(items);
 
   const minTimestamp = new Date();
   minTimestamp.setHours(9, 15, 0, 0); // Set the minimum timestamp to 09:15:00
@@ -196,24 +195,27 @@ const LineChart = () => {
   }, [items, selectedVWAPIndex]);
 
   const handleChartClick = (event) => {
-    const activeElements = chartRef.current.getElementsAtEventForMode(
-      event,
-      "nearest",
-      { intersect: true },
-      false
-    );
-
-    if (activeElements.length > 0) {
-      const clickedDatasetIndex = activeElements[0].datasetIndex;
-      const clickedIndex = activeElements[0].index;
-
-      if (clickedDatasetIndex === 0) {
-        setSelectedVWAPIndex((prevIndex) =>
-          prevIndex === clickedIndex ? null : clickedIndex
-        );
+    if (chartRef.current) {
+      const activeElements = chartRef.current.getElementsAtEventForMode(
+        event,
+        "nearest",
+        { intersect: true },
+        false
+      );
+  
+      if (activeElements.length > 0) {
+        const clickedDatasetIndex = activeElements[0].datasetIndex;
+        const clickedIndex = activeElements[0].index;
+  
+        if (clickedDatasetIndex === 0) {
+          setSelectedVWAPIndex((prevIndex) =>
+            prevIndex === clickedIndex ? null : clickedIndex
+          );
+        }
       }
     }
   };
+  
   const handleResetZoom = () => {
     if (chartRef.current) {
       chartRef.current.resetZoom();

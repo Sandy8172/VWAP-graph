@@ -32,7 +32,7 @@ const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "light" ? "#fff" : grey[800],
 }));
 
-const SelectStrike=(props)=> {
+const SelectStrike = (props) => {
   const { window } = props;
   const [open, setOpen] = React.useState(false);
   const [dropdown1Open, setDropdown1Open] = React.useState(false);
@@ -46,12 +46,14 @@ const SelectStrike=(props)=> {
   const [interval, setInterval] = useState("");
   const dispatch = useDispatch();
 
-  const { callStrikes, putStrikes,refreshCount} = useSelector((state) => ({
-    callStrikes: state.callStrikes,
-    putStrikes: state.putStrikes,
-    refreshCount:state.refreshStorage,
-  }));
-
+  const { callStrikes, putStrikes, refreshCount, ATM } = useSelector(
+    (state) => ({
+      callStrikes: state.callStrikes,
+      putStrikes: state.putStrikes,
+      refreshCount: state.refreshStorage,
+      ATM: state.ATM,
+    })
+  );
   const memoizedCallStrikes = useMemo(() => callStrikes, [callStrikes]);
   const memoizedPutStrikes = useMemo(() => putStrikes, [putStrikes]);
 
@@ -75,7 +77,6 @@ const SelectStrike=(props)=> {
     finalCallStrikesRef.current = finalCallStrikesValue?.split(",").map(Number);
     finalPutStrikesRef.current = finalPutStrikesValue?.split(",").map(Number);
   }, [refreshCount]);
-
 
   const handleDropdown1Toggle = () => {
     setDropdown1Open(!dropdown1Open);
@@ -229,13 +230,15 @@ const SelectStrike=(props)=> {
                           {memoizedCallStrikes.map((value, index) => (
                             <FormControlLabel
                               key={index}
+                              sx={ATM === value ? { color: "blue" } : ""}
                               control={
                                 <Checkbox
                                   value={value}
                                   checked={selectedOptions1.includes(value)}
                                   onChange={handleOptionSelect1}
                                   onClick={(e) => e.stopPropagation()}
-                                />
+                                  sx={ATM === value ? { color: "blue" } : ""}
+                                  />
                               }
                               label={value.toString()}
                             />
@@ -271,12 +274,14 @@ const SelectStrike=(props)=> {
                           {memoizedPutStrikes.map((value, index) => (
                             <FormControlLabel
                               key={index}
+                              sx={ATM === value ? { color: "blue" } : ""}
                               control={
                                 <Checkbox
                                   value={value}
                                   checked={selectedOptions2.includes(value)}
                                   onChange={handleOptionSelect2}
                                   onClick={(e) => e.stopPropagation()}
+                              sx={ATM === value ? { color: "blue" } : ""}
                                 />
                               }
                               label={value.toString()}
@@ -346,6 +351,6 @@ const SelectStrike=(props)=> {
       </SwipeableDrawer>
     </Root>
   );
-}
+};
 
 export default SelectStrike;

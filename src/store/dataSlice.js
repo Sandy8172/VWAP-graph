@@ -6,6 +6,7 @@ const initialState = {
   exchangeId: [],
   refreshStorage: 0,
   finalChartData: [],
+  ATM: 0,
 };
 
 const dataSlice = createSlice({
@@ -30,6 +31,9 @@ const dataSlice = createSlice({
     },
     addFinalChartData(state, action) {
       state.finalChartData = action.payload;
+    },
+    updateATM(state, action) {
+      state.ATM = action.payload;
     },
   },
 });

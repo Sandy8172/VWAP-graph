@@ -25,9 +25,10 @@ const MasterTocken = () => {
       const url = "http://14.99.241.31:3000/apimarketdata/instruments/master";
       const headers = {
         Authorization:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiJYNTAyX2RjMDEzOWQ2MmMyM2Q5MjYyMjM5MzciLCJwdWJsaWNLZXkiOiJkYzAxMzlkNjJjMjNkOTI2MjIzOTM3IiwiaWF0IjoxNjg5MzEwNjIyLCJleHAiOjE2ODkzOTcwMjJ9.Ol1D3q4dQRxmX-Snt5e4H_IaEdF5k2HSXuKzA2Ebpc0",
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiJYNTAyX2RjMDEzOWQ2MmMyM2Q5MjYyMjM5MzciLCJwdWJsaWNLZXkiOiJkYzAxMzlkNjJjMjNkOTI2MjIzOTM3IiwiaWF0IjoxNjkwMjU2NTMyLCJleHAiOjE2OTAzNDI5MzJ9.nZ00KfMnOihIs0xh2nXkVD9coripyGhd_W6yXbjmHHQ",
         "Content-Type": "application/json",
       };
+      
       const body = {
         exchangeSegmentList: ["NSECM", "NSECD", "NSEFO"],
       };
@@ -100,7 +101,6 @@ const MasterTocken = () => {
           const latestMonthRow = getLatestMonthRow();
 
           const exchangeInstrumentID = latestMonthRow.split("|")[1];
-          // console.log(exchangeInstrumentID);
 
           // function to fetch LTP from exchangeInstrumentID -------------------------------------------------
           const fetchLTP = async () => {
@@ -108,7 +108,7 @@ const MasterTocken = () => {
               "http://14.99.241.31:3000/apimarketdata/instruments/quotes";
             const headers = {
               Authorization:
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiJYNTAyX2RjMDEzOWQ2MmMyM2Q5MjYyMjM5MzciLCJwdWJsaWNLZXkiOiJkYzAxMzlkNjJjMjNkOTI2MjIzOTM3IiwiaWF0IjoxNjg5MzEwNjIyLCJleHAiOjE2ODkzOTcwMjJ9.Ol1D3q4dQRxmX-Snt5e4H_IaEdF5k2HSXuKzA2Ebpc0",
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiJYNTAyX2RjMDEzOWQ2MmMyM2Q5MjYyMjM5MzciLCJwdWJsaWNLZXkiOiJkYzAxMzlkNjJjMjNkOTI2MjIzOTM3IiwiaWF0IjoxNjkwMjU2NTMyLCJleHAiOjE2OTAzNDI5MzJ9.nZ00KfMnOihIs0xh2nXkVD9coripyGhd_W6yXbjmHHQ",
             };
 
             const body = {
@@ -132,6 +132,7 @@ const MasterTocken = () => {
 
               // rounding up the LTP with nearest hundreds -----------------
               const nearestStrikes = Math.round(lastTradedPrice / 100) * 100;
+              dispatch(dataSliceActions.updateATM(nearestStrikes));
               const callValues = [];
               const putValues = [];
 
