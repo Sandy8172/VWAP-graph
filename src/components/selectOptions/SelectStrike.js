@@ -32,8 +32,7 @@ const StyledBox = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "light" ? "#fff" : grey[800],
 }));
 
-const SelectStrike = (props) => {
-  const { window } = props;
+const SelectStrike = () => {
   const [open, setOpen] = React.useState(false);
   const [dropdown1Open, setDropdown1Open] = React.useState(false);
   const [dropdown2Open, setDropdown2Open] = React.useState(false);
@@ -61,14 +60,11 @@ const SelectStrike = (props) => {
     setOpen(newOpen);
   };
 
-  // This is used only for the example
-  const container =
-    window !== undefined ? () => window().document.body : undefined;
-
-  const handleChange = (event) => {
+  const changeIntervalHandler = (event) => {
     localStorage.setItem("timeInterval", event.target.value);
     setInterval(localStorage.getItem("timeInterval"));
     dispatch(dataSliceActions.refreshLocalStorage());
+    setOpen(false)
   };
 
   useEffect(() => {
@@ -102,28 +98,6 @@ const SelectStrike = (props) => {
     setSelectedOptions2(selectedOptions);
   };
 
-  const handleClickOutside = (event) => {
-    if (
-      dropdown1Ref.current &&
-      !dropdown1Ref.current.contains(event.target) &&
-      dropdown1Open
-    ) {
-      setDropdown1Open(false);
-    }
-    if (
-      dropdown2Ref.current &&
-      !dropdown2Ref.current.contains(event.target) &&
-      dropdown2Open
-    ) {
-      setDropdown2Open(false);
-    }
-  };
-  React.useEffect(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -138,12 +112,13 @@ const SelectStrike = (props) => {
       setSelectedOptions2([]);
       setDropdown1Open(false);
       setDropdown2Open(false);
+      setOpen(false);
     } else {
       const isSubmitButtonClicked =
         event.nativeEvent.submitter.getAttribute("type") === "submit";
 
       if (isSubmitButtonClicked) {
-        alert("Please select three same numbers of strategies.");
+        alert("Please select atleast two strikes.");
       }
     }
   };
@@ -167,7 +142,6 @@ const SelectStrike = (props) => {
         </Button>
       </Box>
       <SwipeableDrawer
-        container={container}
         anchor="bottom"
         open={open}
         onClose={toggleDrawer(false)}
@@ -238,7 +212,7 @@ const SelectStrike = (props) => {
                                   onChange={handleOptionSelect1}
                                   onClick={(e) => e.stopPropagation()}
                                   sx={ATM === value ? { color: "blue" } : ""}
-                                  />
+                                />
                               }
                               label={value.toString()}
                             />
@@ -281,7 +255,7 @@ const SelectStrike = (props) => {
                                   checked={selectedOptions2.includes(value)}
                                   onChange={handleOptionSelect2}
                                   onClick={(e) => e.stopPropagation()}
-                              sx={ATM === value ? { color: "blue" } : ""}
+                                  sx={ATM === value ? { color: "blue" } : ""}
                                 />
                               }
                               label={value.toString()}
@@ -304,7 +278,7 @@ const SelectStrike = (props) => {
                   <Select
                     value={interval}
                     label="interval"
-                    onChange={handleChange}
+                    onChange={changeIntervalHandler}
                   >
                     <MenuItem value={60}>1 Min</MenuItem>
                     <MenuItem value={300}>5 Min</MenuItem>

@@ -25,10 +25,10 @@ const MasterTocken = () => {
       const url = "http://14.99.241.31:3000/apimarketdata/instruments/master";
       const headers = {
         Authorization:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiJYNTAyX2RjMDEzOWQ2MmMyM2Q5MjYyMjM5MzciLCJwdWJsaWNLZXkiOiJkYzAxMzlkNjJjMjNkOTI2MjIzOTM3IiwiaWF0IjoxNjkwMjU2NTMyLCJleHAiOjE2OTAzNDI5MzJ9.nZ00KfMnOihIs0xh2nXkVD9coripyGhd_W6yXbjmHHQ",
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiJYNTAyX2RjMDEzOWQ2MmMyM2Q5MjYyMjM5MzciLCJwdWJsaWNLZXkiOiJkYzAxMzlkNjJjMjNkOTI2MjIzOTM3IiwiaWF0IjoxNjkyODQ3OTQ5LCJleHAiOjE2OTI5MzQzNDl9.B_hnEVCskVDYNwk2_L5gaL9fWJyOEsIODyWMQBCcl3Y",
         "Content-Type": "application/json",
       };
-      
+
       const body = {
         exchangeSegmentList: ["NSECM", "NSECD", "NSEFO"],
       };
@@ -45,33 +45,41 @@ const MasterTocken = () => {
           const bankNiftyData = instrumentData.filter((line) =>
             line.includes("BANKNIFTY")
           );
-
+          // console.log(bankNiftyData);
           //Extracting Future index from BankNifty data --------------------------
 
           const futureData = bankNiftyData.filter((line) =>
             line.includes("FUTIDX")
           );
-          // console.log(futureData);
+          const filteredFutureData = futureData.slice(0, 3);
+          // console.log(filteredFutureData);
 
           //Extracting option index from BankNifty data --------------------------
 
           const OptionData = bankNiftyData.filter((line) =>
             line.includes("OPTIDX")
           );
+          // console.log(OptionData);
 
           // extracting current month row data from future index ------------------
 
           const getLatestMonthRow = () => {
-            const currentDate = new Date();
-            const currentMonth = currentDate
-              .toLocaleString("default", { month: "short" })
-              .toUpperCase();
+            // Calculate upcoming Thursday
+            const today = new Date();
+            const upcomingThursday = new Date(today);
+            upcomingThursday.setDate(
+              today.getDate() + ((4 - today.getDay() + 7) % 7)
+            );
+            // Get the month of the upcoming Thursday
+            const monthOfUpcomingThursday = upcomingThursday.toLocaleString(
+              "default",
+              { month: "short" }
+            ).toUpperCase();
 
             let latestMonthYearRow = null;
-            let nextMonthYearRow = null;
 
-            for (let i = 0; i < futureData.length; i++) {
-              const row = futureData[i];
+            for (let i = 0; i < filteredFutureData.length; i++) {
+              const row = filteredFutureData[i];
               const parts = row.split("|");
               const instrument = parts[4];
               const monthYearMatch = instrument.match(
@@ -80,27 +88,19 @@ const MasterTocken = () => {
 
               if (monthYearMatch) {
                 const monthYear = monthYearMatch[1].toUpperCase();
-
-                if (monthYear === currentMonth) {
+                if (monthYear === monthOfUpcomingThursday) {
                   latestMonthYearRow = row;
                   break;
-                } else if (
-                  !nextMonthYearRow ||
-                  monthYear <
-                    nextMonthYearRow
-                      .match(/BANKNIFTY\d+([a-zA-Z]+)FUT/)[1]
-                      .toUpperCase()
-                ) {
-                  nextMonthYearRow = row;
-                }
+                } 
               }
             }
-
-            return latestMonthYearRow || nextMonthYearRow;
+            return latestMonthYearRow ;
           };
           const latestMonthRow = getLatestMonthRow();
+          // console.log(latestMonthRow);
 
           const exchangeInstrumentID = latestMonthRow.split("|")[1];
+          // console.log(exchangeInstrumentID);
 
           // function to fetch LTP from exchangeInstrumentID -------------------------------------------------
           const fetchLTP = async () => {
@@ -108,7 +108,7 @@ const MasterTocken = () => {
               "http://14.99.241.31:3000/apimarketdata/instruments/quotes";
             const headers = {
               Authorization:
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiJYNTAyX2RjMDEzOWQ2MmMyM2Q5MjYyMjM5MzciLCJwdWJsaWNLZXkiOiJkYzAxMzlkNjJjMjNkOTI2MjIzOTM3IiwiaWF0IjoxNjkwMjU2NTMyLCJleHAiOjE2OTAzNDI5MzJ9.nZ00KfMnOihIs0xh2nXkVD9coripyGhd_W6yXbjmHHQ",
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiJYNTAyX2RjMDEzOWQ2MmMyM2Q5MjYyMjM5MzciLCJwdWJsaWNLZXkiOiJkYzAxMzlkNjJjMjNkOTI2MjIzOTM3IiwiaWF0IjoxNjkyODQ3OTQ5LCJleHAiOjE2OTI5MzQzNDl9.B_hnEVCskVDYNwk2_L5gaL9fWJyOEsIODyWMQBCcl3Y",
             };
 
             const body = {
@@ -126,6 +126,7 @@ const MasterTocken = () => {
             try {
               const response = await axios.post(url, body, { headers });
               const { data } = response;
+              // console.log(data);
               const quotes = JSON.parse(data.result.listQuotes[0]);
               const lastTradedPrice = quotes.LastTradedPrice;
               // console.log(lastTradedPrice);
@@ -146,19 +147,24 @@ const MasterTocken = () => {
               dispatch(dataSliceActions.strikePrice({ callValues, putValues }));
               // filter call values -----------------------------
               const filteredCallOptionData = OptionData.filter((line) => {
-                const instrumentName = line?.split("|")[4];
+                const instrumentName =
+                  line?.split("|")[line.split("|").length - 2];
+                // console.log(instrumentName);
                 return finalCallStrikesRef.current?.some((value) =>
                   instrumentName.includes(value)
                 );
               });
+              // console.log(filteredCallOptionData);
               // filter put values ---------------------------------
 
               const filteredPutOptionData = OptionData.filter((line) => {
-                const instrumentName = line?.split("|")[4];
+                const instrumentName =
+                  line?.split("|")[line.split("|").length - 2];
                 return finalPutStrikesRef.current?.some((value) =>
                   instrumentName.includes(value)
                 );
               });
+              // console.log(filteredPutOptionData);
 
               // function for filter only call and put options
 
@@ -183,6 +189,7 @@ const MasterTocken = () => {
                 filteredPutOptionData,
                 "4"
               );
+              // console.log(allCallOptions, allPutOptions);
 
               // function to find data only includes the latest thersday----------------------------------
 
@@ -192,6 +199,7 @@ const MasterTocken = () => {
                 upcomingThursday.setDate(
                   today.getDate() + ((4 - today.getDay() + 7) % 7)
                 ); // Calculate upcoming Thursday
+                // console.log(upcomingThursday);
 
                 const upcomingThursdayString = upcomingThursday
                   .toISOString()

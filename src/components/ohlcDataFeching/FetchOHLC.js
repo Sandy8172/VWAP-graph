@@ -12,7 +12,7 @@ function FetchOHLC() {
 
   const exchangeId = useSelector((state) => state.exchangeId);
   const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiJYNTAyX2RjMDEzOWQ2MmMyM2Q5MjYyMjM5MzciLCJwdWJsaWNLZXkiOiJkYzAxMzlkNjJjMjNkOTI2MjIzOTM3IiwiaWF0IjoxNjkwMjU2NTMyLCJleHAiOjE2OTAzNDI5MzJ9.nZ00KfMnOihIs0xh2nXkVD9coripyGhd_W6yXbjmHHQ";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiJYNTAyX2RjMDEzOWQ2MmMyM2Q5MjYyMjM5MzciLCJwdWJsaWNLZXkiOiJkYzAxMzlkNjJjMjNkOTI2MjIzOTM3IiwiaWF0IjoxNjkyODQ3OTQ5LCJleHAiOjE2OTI5MzQzNDl9.B_hnEVCskVDYNwk2_L5gaL9fWJyOEsIODyWMQBCcl3Y";
   const currentDate = new Date();
   const currentDateString = currentDate
     .toLocaleDateString("en-US", {
@@ -24,7 +24,6 @@ function FetchOHLC() {
 
   const startTime = `${currentDateString} 091500`;
   const endTime = `${currentDateString} 153000`;
-  // console.log(startTime, endTime);
 
   const refreshCount = useSelector((state) => state.refreshStorage);
 
@@ -77,7 +76,7 @@ function FetchOHLC() {
     return () => clearInterval(interval);
   }, [exchangeId, timeInterval]);
 
-  // splitting data and assigning the keys--------------------------------------------------------------
+  // splitting data and assigning the keys-----------------------------------------------
 
   const dataResponses = data?.map((item) => item.result.dataReponse);
   const splitOHLCData = dataResponses?.map((response) => {
@@ -86,10 +85,8 @@ function FetchOHLC() {
       return { timestamp, open, high, low, close, volume, OI };
     });
   });
-
-  // console.log(splitOHLCData);
-
-  //function to calculate VWAP and LTP
+// console.log(splitOHLCData);
+  //function to calculate VWAP and LTP -------------------------------------------------
 
   const calculateVWAPAndLTP = (data) => {
     const finalResult = [];
@@ -103,7 +100,7 @@ function FetchOHLC() {
         let timestampValue;
 
         for (let j = 0; j < data.length; j++) {
-          const item = data[j][i];
+          const item = data[j][i];  
 
           if (
             item &&
