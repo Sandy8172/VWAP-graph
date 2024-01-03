@@ -15,7 +15,6 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import { useSelector, useDispatch } from "react-redux";
 import { dataSliceActions } from "../../store/dataSlice";
-
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 
 const drawerBleeding = 150;
@@ -42,7 +41,7 @@ const SelectStrike = () => {
   const dropdown2Ref = React.useRef();
   const finalCallStrikesRef = React.useRef([]);
   const finalPutStrikesRef = React.useRef([]);
-  const [interval, setInterval] = useState("");
+  const [interval, setInterval] = useState(60);
   const dispatch = useDispatch();
 
   const { callStrikes, putStrikes, refreshCount, ATM } = useSelector(
@@ -64,7 +63,7 @@ const SelectStrike = () => {
     localStorage.setItem("timeInterval", event.target.value);
     setInterval(localStorage.getItem("timeInterval"));
     dispatch(dataSliceActions.refreshLocalStorage());
-    setOpen(false)
+    setOpen(false);
   };
 
   useEffect(() => {
@@ -74,11 +73,13 @@ const SelectStrike = () => {
     finalPutStrikesRef.current = finalPutStrikesValue?.split(",").map(Number);
   }, [refreshCount]);
 
-  const handleDropdown1Toggle = () => {
+  const handleDropdown1Toggle = (event) => {
+    event.stopPropagation();
     setDropdown1Open(!dropdown1Open);
   };
 
-  const handleDropdown2Toggle = () => {
+  const handleDropdown2Toggle = (event) => {
+    event.stopPropagation();
     setDropdown2Open(!dropdown2Open);
   };
 
@@ -102,14 +103,15 @@ const SelectStrike = () => {
     event.preventDefault();
 
     if (
-      selectedOptions1.length === selectedOptions2.length &&
-      selectedOptions1.length > 1
+      selectedOptions1.length === selectedOptions2.length
+      // &&
+      // selectedOptions1.length > 1
     ) {
       localStorage.setItem("SelectedCall", selectedOptions1);
       localStorage.setItem("SelectedPut", selectedOptions2);
       dispatch(dataSliceActions.refreshLocalStorage());
-      setSelectedOptions1([]);
-      setSelectedOptions2([]);
+      // setSelectedOptions1([]);
+      // setSelectedOptions2([]);
       setDropdown1Open(false);
       setDropdown2Open(false);
       setOpen(false);
@@ -134,10 +136,25 @@ const SelectStrike = () => {
           },
         }}
       />
+      
       <Box
-        sx={{ textAlign: "center", pt: 1, background: "rgb(225, 236, 200)" }}
+        sx={{ textAlign: "center", background: "rgb(225, 236, 200)",display:"flex" }}
       >
-        <Button onClick={toggleDrawer(true)}>
+                <FormControl variant="standard" sx={{ml: 1,maxWidth: 120,flex:"1" }}>
+                  <InputLabel>Interval</InputLabel>
+                  <Select
+                    value={interval}
+                    label="interval"
+                    onChange={changeIntervalHandler}
+                  >
+                    <MenuItem value={60}>1 Min</MenuItem>
+                    <MenuItem value={300}>5 Min</MenuItem>
+                    <MenuItem value={900}>15 Min</MenuItem>
+                    <MenuItem value={1800}>30 Min</MenuItem>
+                    <MenuItem value={3600}>1 hr</MenuItem>
+                  </Select>
+                </FormControl>
+        <Button sx={{flex:"1",mr:15 }} onClick={toggleDrawer(true)}>
           <b>Filters</b>
         </Button>
       </Box>
@@ -185,10 +202,12 @@ const SelectStrike = () => {
                   <div
                     id="dropdown1"
                     className={`dropdown ${dropdown1Open ? "open" : ""}`}
-                    onClick={handleDropdown1Toggle}
                     ref={dropdown1Ref}
                   >
-                    <div className="dropdown-trigger">
+                    <div
+                      className="dropdown-trigger"
+                      onClick={handleDropdown1Toggle}
+                    >
                       <Button
                         variant="contained"
                         sx={{ backgroundColor: "grey", padding: "1px" }}
@@ -204,14 +223,13 @@ const SelectStrike = () => {
                           {memoizedCallStrikes.map((value, index) => (
                             <FormControlLabel
                               key={index}
-                              sx={ATM === value ? { color: "blue" } : ""}
+                              style={ATM === value ? { color: "blue" } : {}}
                               control={
                                 <Checkbox
                                   value={value}
-                                  checked={selectedOptions1.includes(value)}
+                                  checked={selectedOptions1.includes(value) }
                                   onChange={handleOptionSelect1}
-                                  onClick={(e) => e.stopPropagation()}
-                                  sx={ATM === value ? { color: "blue" } : ""}
+                                  style={ATM === value ? { color: "blue" } : {}}
                                 />
                               }
                               label={value.toString()}
@@ -229,10 +247,12 @@ const SelectStrike = () => {
                   <div
                     id="dropdown2"
                     className={`dropdown ${dropdown2Open ? "open" : ""}`}
-                    onClick={handleDropdown2Toggle}
                     ref={dropdown2Ref}
                   >
-                    <div className="dropdown-trigger">
+                    <div
+                      className="dropdown-trigger"
+                      onClick={handleDropdown2Toggle}
+                    >
                       <Button
                         variant="contained"
                         sx={{ backgroundColor: "grey", padding: "1px" }}
@@ -248,14 +268,13 @@ const SelectStrike = () => {
                           {memoizedPutStrikes.map((value, index) => (
                             <FormControlLabel
                               key={index}
-                              sx={ATM === value ? { color: "blue" } : ""}
+                              style={ATM === value ? { color: "blue" } : {}}
                               control={
                                 <Checkbox
                                   value={value}
                                   checked={selectedOptions2.includes(value)}
                                   onChange={handleOptionSelect2}
-                                  onClick={(e) => e.stopPropagation()}
-                                  sx={ATM === value ? { color: "blue" } : ""}
+                                  style={ATM === value ? { color: "blue" } : {}}
                                 />
                               }
                               label={value.toString()}
@@ -271,7 +290,7 @@ const SelectStrike = () => {
                 Show Chart
               </Button>
             </form>
-            {!dropdown1Open && !dropdown2Open && (
+            {/* {!dropdown1Open && !dropdown2Open && (
               <Box sx={{ minWidth: 120 }}>
                 <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
                   <InputLabel>Interval</InputLabel>
@@ -288,7 +307,7 @@ const SelectStrike = () => {
                   </Select>
                 </FormControl>
               </Box>
-            )}
+            )} */}
             {!dropdown1Open && !dropdown2Open && (
               <div>
                 <Card sx={{ width: 170, height: 100 }}>

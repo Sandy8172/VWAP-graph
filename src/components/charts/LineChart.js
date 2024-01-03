@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Chart, registerables } from "chart.js";
-import Button from '@mui/material/Button';
+import Button from "@mui/material/Button";
 import "chartjs-plugin-annotation";
 import "chartjs-adapter-date-fns"; // Import date-fns adapter for time scales
-import zoomPlugin from 'chartjs-plugin-zoom';
-import SearchOffIcon from '@mui/icons-material/SearchOff';
-
+import zoomPlugin from "chartjs-plugin-zoom";
+import SearchOffIcon from "@mui/icons-material/SearchOff";
 
 Chart.register(...registerables, zoomPlugin);
 // Chart.register(...registerables, zoomPlugin);
@@ -85,10 +84,11 @@ const LineChart = () => {
             ],
           },
           options: {
+            // pointStyle: "cross",
             responsive: true,
             maintainAspectRatio: false,
             animation: {
-              duration: 2000,
+              duration: 500,
               easing: "easeOutQuad",
             },
             scales: {
@@ -155,8 +155,6 @@ const LineChart = () => {
             },
           },
         });
-
-      
       }
 
       const VWAPPoints = items.map((item) => ({
@@ -202,11 +200,11 @@ const LineChart = () => {
         { intersect: true },
         false
       );
-  
+
       if (activeElements.length > 0) {
         const clickedDatasetIndex = activeElements[0].datasetIndex;
         const clickedIndex = activeElements[0].index;
-  
+
         if (clickedDatasetIndex === 0) {
           setSelectedVWAPIndex((prevIndex) =>
             prevIndex === clickedIndex ? null : clickedIndex
@@ -215,7 +213,7 @@ const LineChart = () => {
       }
     }
   };
-  
+
   const handleResetZoom = () => {
     if (chartRef.current) {
       chartRef.current.resetZoom();
@@ -226,11 +224,24 @@ const LineChart = () => {
     <div
       style={{
         width: "100%",
-        height: "95vh",
+        height: "94vh",
         backgroundColor: "rgb(247, 255, 229)",
       }}
     >
-       <Button sx={{position:"absolute", right:"2px", top:"7px", padding:"2px",fontSize:"0.8rem"}} variant="contained" color="success" onClick={handleResetZoom}><SearchOffIcon/></Button>
+      <Button
+        sx={{
+          position: "absolute",
+          right: "2px",
+          top: "7px",
+          padding: "2px",
+          fontSize: "0.8rem",
+        }}
+        variant="contained"
+        color="success"
+        onClick={handleResetZoom}
+      >
+        <SearchOffIcon />
+      </Button>
       <canvas
         id="chart"
         style={{ width: "100%", height: "100%" }}
